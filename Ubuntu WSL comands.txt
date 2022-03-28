@@ -1,0 +1,4 @@
+cd /mnt/c/projects/ThreadX/make_test_project
+rm -r release
+./make_release.sh
+./release/linux_release

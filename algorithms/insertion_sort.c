@@ -13,10 +13,10 @@ void insertion_sort(
         char temp_byte = array_ptr[j];
 
         while((i >= 0) && 
-              (condition_fn(array_ptr[i],temp_byte)))
+              (condition_fn(array_ptr[i], temp_byte)))
         {
             array_ptr[i + 1] = array_ptr[i];
-            i -= 1;
+            i--;
         }
         array_ptr[i + 1] = temp_byte;
     }

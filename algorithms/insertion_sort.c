@@ -6,6 +6,7 @@ void insertion_sort(
     unsigned long array_len,
     char (*condition_fn)(char, char))
 {
+    assert(array_ptr, "Null-pointer in insertion_sort");
     assert(condition_fn, "Null-pointer in insertion_sort");
     for(unsigned long j = 1; j < array_len; j++)
     {

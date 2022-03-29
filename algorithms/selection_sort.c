@@ -6,6 +6,7 @@ void selection_sort(
     unsigned long array_len, 
     char (*condition_fn)(char, char)) 
 {
+    assert(array_ptr, "Null-pointer in insertion_sort");
     assert(condition_fn, "Null-pointer in insertion_sort");
     for(unsigned long i = 0; i < array_len - 1; i++)
     {

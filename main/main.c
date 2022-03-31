@@ -2,6 +2,7 @@
 #include "insertion_sort.h"
 #include "selection_sort.h"
 #include "merge_sort.h"
+#include "quick_sort.h"
 #include "tx_api.h"
 
 #define     STACK_SIZE         1024
@@ -59,6 +60,8 @@ static void  main_thread_entry(ULONG thread_input)
     update_minimal_memory_available();
     check_sort_algorithm(insertion_sort);
     check_sort_algorithm(selection_sort);
+    check_sort_algorithm(quick_sort);
+    check_sort_algorithm(quick_sort_randomized);
     check_sort_algorithm(merge_sort);
 }
 
@@ -104,6 +107,14 @@ static void  check_sort_algorithm(void (*sort_algorithm)(
     if (sort_algorithm == merge_sort)
     {
         sprintf(message, "%s", "merge_sort");
+    }else
+    if (sort_algorithm == quick_sort)
+    {
+        sprintf(message, "%s", "quick_sort");
+    }else
+    if (sort_algorithm == quick_sort_randomized)
+    {
+        sprintf(message, "%s", "quick_sort_randomized");
     }
 
     printf("Start %s. Current Time: %lu\n", message, (unsigned long)(tx_time_get()));

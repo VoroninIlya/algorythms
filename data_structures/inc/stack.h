@@ -1,0 +1,20 @@
+#ifndef STACK_H
+#define STACK_H
+
+typedef struct {
+    char* main_ptr;
+    char* top_ptr;
+    unsigned long int size;
+}stack_t;
+
+char stack_init(stack_t* const stack_ptr, unsigned long int size);
+char is_stack_empty(stack_t* const stack_ptr);
+unsigned long int get_stack_number_of_elements(stack_t* const stack_ptr);
+unsigned long int get_stack_free_space(stack_t* const stack_ptr);
+char push_byte(stack_t* const stack_ptr, char byte);
+char pop_byte(stack_t* const stack_ptr, char* byte);
+char push_byte_array(stack_t* const stack_ptr, char* array, unsigned long int array_len);
+char pop_byte_array(stack_t* const stack_ptr, char* array, unsigned long int array_len);
+void print_stack_content(stack_t* const stack_ptr);
+
+#endif // STACK_H

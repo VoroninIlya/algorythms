@@ -5,23 +5,30 @@
 #include "merge_sort.h"
 #include "quick_sort.h"
 #endif
+
 #if (1 == CHECK_DATA_STRUCTURES)
 #include "stack.h"
+#include "queue.h"
 #endif
+
 #include "tx_api.h"
 
 #define     STACK_SIZE         1024
 #define     DATA_LENGTH        0
 #define     MY_STACK_SIZE      0
+#define     MY_QUEUE_SIZE      0
 
 #if (1 == CHECK_SORT_ALGORITHMS)
 #define     DATA_LENGTH        10
 #endif
 #if (1 == CHECK_DATA_STRUCTURES)
-#define     MY_STACK_SIZE      1024
+#define     MY_STACK_SIZE      7
+#define     MY_QUEUE_SIZE      7
 #endif
 
-#define     BYTE_POOL_SIZE     (STACK_SIZE*2 + DATA_LENGTH*2 + MY_STACK_SIZE)
+#define     BYTE_POOL_SIZE     (STACK_SIZE*2 + DATA_LENGTH*2 + \
+                                MY_STACK_SIZE + MY_QUEUE_SIZE)
+
 #define     DEBUG_PRINTF       (1)
 
 TX_THREAD     main_thread;
@@ -41,6 +48,10 @@ static unsigned long minimal_memory_available = 0;
 
 #if (1 == CHECK_DATA_STRUCTURES)
 static stack_t my_stack = {NULL, NULL, 0};
+static queue_t my_queue = {NULL, NULL, NULL, 0};
+
+static void check_stack(void);
+static void check_queue(void);
 #endif
 
 int main(void)
@@ -72,16 +83,15 @@ void    tx_application_define(void *first_unused_memory)
                      TX_NO_TIME_SLICE, TX_AUTO_START);
 
 #if (1 == CHECK_DATA_STRUCTURES)
-    if (0 == stack_init(&my_stack, STACK_SIZE))
-    {
-        printf("ERROR: my_stack initialization\n");
-    }
-    else
-    {
-        unsigned long int stack_space = get_stack_free_space(&my_stack);
-        printf("my_stack initialized\n");
-        printf("my_stack free space: %lu\n", stack_space);
-    }
+    stack_init(&my_stack, MY_STACK_SIZE);
+    unsigned long int stack_space = get_stack_free_space(&my_stack);
+    printf("my_stack initialized\n");
+    printf("my_stack free space: %lu\n", stack_space);
+    
+    queue_init(&my_queue, MY_QUEUE_SIZE);
+    unsigned long int queue_space = get_queue_free_space(&my_queue);
+    printf("my_queue initialized\n");
+    printf("my_queue free space: %lu\n", queue_space);
 #endif
 }
 
@@ -95,26 +105,10 @@ static void  main_thread_entry(ULONG thread_input)
     check_sort_algorithm(quick_sort_randomized);
     check_sort_algorithm(merge_sort);
 #endif
+
 #if (1 == CHECK_DATA_STRUCTURES)
-    char temp_arr[5] = {0x03, 0x04, 0x05, 0x06, 0x07};
-    char temp_byte = 0;
-    push_byte(&my_stack, 0x01);
-    print_stack_content(&my_stack);
-    push_byte(&my_stack, 0x02);
-    print_stack_content(&my_stack);
-    push_byte_array(&my_stack, temp_arr, 5);
-    print_stack_content(&my_stack);
-    printf("my_stack number of elements: %lu\n", get_stack_number_of_elements(&my_stack));
-    printf("my_stack free space: %lu\n", get_stack_free_space(&my_stack));
-    
-    
-    pop_byte(&my_stack, &temp_byte);
-    print_stack_content(&my_stack);
-    pop_byte(&my_stack, &temp_byte);
-    print_stack_content(&my_stack);
-    pop_byte_array(&my_stack, temp_arr, 5);
-    printf("my_stack number of elements: %lu\n", get_stack_number_of_elements(&my_stack));
-    printf("my_stack free space: %lu\n", get_stack_free_space(&my_stack));
+    check_stack();
+    check_queue();
 #endif
 }
 
@@ -220,4 +214,104 @@ void update_minimal_memory_available(void)
     {
         minimal_memory_available = available;
     }
+}
+
+static void check_stack(void)
+{
+    char temp_arr[5] = {0x03, 0x04, 0x05, 0x06, 0x07};
+    char temp_byte = 0;
+    
+    printf("1. Add byte to the stack:\n");
+    push_byte(&my_stack, 0x01);
+    print_stack_content(&my_stack);
+    printf("\n");
+    printf("2. Add byte to the stack:\n");
+    push_byte(&my_stack, 0x02);
+    print_stack_content(&my_stack);
+    printf("\n");
+    printf("3. Add byte array to the stack:\n");
+    push_byte_array(&my_stack, temp_arr, 5);
+    print_stack_content(&my_stack);
+    printf("my_stack number of elements: %lu\n", get_stack_number_of_elements(&my_stack));
+    printf("my_stack free space: %lu\n", get_stack_free_space(&my_stack));
+    printf("\n");
+    printf("4. Add byte array to the stack:\n");
+    push_byte_array(&my_stack, temp_arr, 5);
+    print_stack_content(&my_stack);
+    printf("\n");
+    printf("5. Get byte from the stack:\n");
+    pop_byte(&my_stack, &temp_byte);
+    print_stack_content(&my_stack);
+    printf("\n");
+    printf("6. Get byte from the stack:\n");
+    pop_byte(&my_stack, &temp_byte);
+    print_stack_content(&my_stack);
+    printf("\n");
+    printf("7. Get byte array from the stack:\n");
+    pop_byte_array(&my_stack, temp_arr, 5);
+    print_stack_content(&my_stack);
+    printf("my_stack number of elements: %lu\n", get_stack_number_of_elements(&my_stack));
+    printf("my_stack free space: %lu\n\n", get_stack_free_space(&my_stack));
+    
+    stack_deinit(&my_stack);
+}
+
+static void check_queue(void)
+{
+    char temp_arr[5] = {0x03, 0x04, 0x05, 0x06, 0x07};
+    char temp_byte = 0;
+    
+    printf("1. Add byte to the queue:\n");
+    enqueue_byte(&my_queue, 0x01);
+    print_queue_content(&my_queue);
+    printf("my_queue free space: %lu\n\n", get_queue_free_space(&my_queue));
+    
+    printf("2. Add byte to the queue:\n");
+    enqueue_byte(&my_queue, 0x02);
+    print_queue_content(&my_queue);
+    printf("my_queue free space: %lu\n\n", get_queue_free_space(&my_queue));
+    
+    printf("3. Add byte array to the queue:\n");
+    enqueue_byte_array(&my_queue, temp_arr, 5);
+    print_queue_content(&my_queue);
+    printf("my_queue number of elements: %lu\n", get_queue_number_of_elements(&my_queue));
+    printf("my_queue free space: %lu\n\n", get_queue_free_space(&my_queue));
+    
+    printf("4. Get byte from the queue:\n");
+    dequeue_byte(&my_queue, &temp_byte);
+    print_queue_content(&my_queue);
+    printf("my_queue free space: %lu\n\n", get_queue_free_space(&my_queue));
+    
+    printf("5. Add byte to the queue:\n");
+    enqueue_byte(&my_queue, 0x06);
+    print_queue_content(&my_queue);
+    printf("my_queue free space: %lu\n\n", get_queue_free_space(&my_queue));
+    
+    printf("6. Get byte from the queue:\n");
+    dequeue_byte(&my_queue, &temp_byte);
+    print_queue_content(&my_queue);
+    printf("my_queue free space: %lu\n\n", get_queue_free_space(&my_queue));
+    
+    printf("7. Get byte array from the queue:\n");
+    dequeue_byte_array(&my_queue, temp_arr, 5);
+    print_queue_content(&my_queue);
+    printf("my_queue number of elements: %lu\n", get_queue_number_of_elements(&my_queue));
+    printf("my_queue free space: %lu\n\n", get_queue_free_space(&my_queue));
+    
+    printf("8. Add byte array to the queue:\n");
+    enqueue_byte(&my_queue, 0x07);
+    print_queue_content(&my_queue);
+    printf("my_queue free space: %lu\n\n", get_queue_free_space(&my_queue));
+    
+    printf("9. Add byte array to the queue:\n");
+    enqueue_byte(&my_queue, 0x08);
+    print_queue_content(&my_queue);
+    printf("my_queue free space: %lu\n\n", get_queue_free_space(&my_queue));
+    
+    printf("10. Get byte from the queue:\n");
+    dequeue_byte(&my_queue, &temp_byte);
+    print_queue_content(&my_queue);
+    printf("my_queue free space: %lu\n\n", get_queue_free_space(&my_queue));
+    
+    queue_deinit(&my_queue);
 }

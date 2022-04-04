@@ -1,7 +1,7 @@
 #include "stack.h"
 #include "main.h"
 
-char stack_init(stack_t* const stack_ptr, unsigned long int size)
+void stack_init(stack_t* const stack_ptr, unsigned long int size)
 {
     if ((NULL == stack_ptr->main_ptr) &&
         (NULL == stack_ptr->top_ptr))
@@ -13,7 +13,17 @@ char stack_init(stack_t* const stack_ptr, unsigned long int size)
             stack_ptr->size = size;
         }
     }
-    return 1;
+}
+
+void stack_deinit(stack_t* const stack_ptr)
+{
+    if (NULL != stack_ptr->main_ptr)
+    {
+        my_free(stack_ptr->main_ptr);
+        stack_ptr->main_ptr = NULL;
+        stack_ptr->top_ptr = NULL;
+        stack_ptr->size = 0;
+    }
 }
 
 char is_stack_empty(stack_t* const stack_ptr)
@@ -91,10 +101,29 @@ char pop_byte_array(stack_t* const stack_ptr, char* array, unsigned long int dat
 void print_stack_content(stack_t* const stack_ptr)
 {
     unsigned long int numb_of_elements = get_stack_number_of_elements(stack_ptr);
+    unsigned long int top_ptr_index = stack_ptr->top_ptr - stack_ptr->main_ptr;
     
-    for(unsigned long int i = 0; i < numb_of_elements; i++)
+    
+    for(unsigned long int i = 0; i <= stack_ptr->size; i++)
     {
-        printf("%02X ", stack_ptr->main_ptr[i]);
+        if (i == top_ptr_index)
+        {
+            printf(" T ");
+        }else
+        {
+            printf("   ");
+        }
     }
     printf("\n");
+    for(unsigned long int i = 0; i < stack_ptr->size; i++)
+    {
+        if (i < top_ptr_index)
+        {
+            printf("|%02X", stack_ptr->main_ptr[i]);
+        }else
+        {
+            printf("|  ");
+        }
+    }
+    printf("|\n");
 }

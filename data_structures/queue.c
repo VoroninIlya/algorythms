@@ -47,7 +47,7 @@ unsigned long int get_queue_number_of_elements(queue_t* const queue_ptr)
         result = (unsigned long int)(queue_ptr->tail_ptr - queue_ptr->head_ptr);
     }else
     {
-        result = (unsigned long int)(queue_ptr->tail_ptr - queue_ptr->main_ptr) +
+        result = (unsigned long int)(queue_ptr->tail_ptr + 1 - queue_ptr->main_ptr) +
             queue_ptr->size - (unsigned long int)(queue_ptr->head_ptr - queue_ptr->main_ptr);
     }
     return result;

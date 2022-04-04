@@ -1,6 +1,10 @@
 #ifndef QUEUE_H
 #define QUEUE_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct {
     char* main_ptr;
     char* head_ptr;
@@ -18,5 +22,9 @@ char dequeue_byte(queue_t* const queue_ptr, char* byte);
 char enqueue_byte_array(queue_t* const queue_ptr, char* array, unsigned long int data_len);
 char dequeue_byte_array(queue_t* const queue_ptr, char* array, unsigned long int data_len);
 void print_queue_content(queue_t* const queue_ptr);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // QUEUE_H

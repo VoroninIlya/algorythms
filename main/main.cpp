@@ -9,9 +9,18 @@
 #if (1 == CHECK_DATA_STRUCTURES)
 #include "stack.h"
 #include "queue.h"
+#include "doubly_linked_list.hpp"
+#endif
+
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 #include "tx_api.h"
+
+#ifdef __cplusplus
+}
+#endif
 
 #define     STACK_SIZE         1024
 #define     DATA_LENGTH        0
@@ -179,6 +188,10 @@ static void  check_sort_algorithm(void (*sort_algorithm)(
 }
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void* my_malloc(size_t size){
     void* result = NULL;
     void* temp_pointer = NULL;
@@ -215,6 +228,10 @@ void update_minimal_memory_available(void)
         minimal_memory_available = available;
     }
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 static void check_stack(void)
 {

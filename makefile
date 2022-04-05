@@ -23,9 +23,10 @@ objects := \
 source_dirs    := $(addprefix ../,$(source_dirs))
 include_dirs   := $(addprefix ../,$(include_dirs))
 
-# flag -lpthread is important
+# flag -lpthread is important for linus
+# flag -lstdc++ is important for cpp
 linux_release: $(objects)
-	gcc $(compile_flags) $^ -lpthread  -o $@
+	gcc $(compile_flags) $^ -lpthread -lstdc++ -o $@
 
 VPATH := $(include_dirs) $(source_dirs)
 
@@ -35,7 +36,7 @@ VPATH := $(include_dirs) $(source_dirs)
     $<
     
 %.o: %.cpp
-	gcc $(compile_flags) -c -MD -lpthread  $(LDFLAGS) $(addprefix -I,$(include_dirs)) \
+	gcc $(compile_flags) -c -MD -lpthread -lstdc++ $(LDFLAGS) $(addprefix -I,$(include_dirs)) \
     -I/usr/include/ \
     $<
 

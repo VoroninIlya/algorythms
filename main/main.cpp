@@ -45,6 +45,7 @@ TX_BYTE_POOL  main_pool;
 
 static void  main_thread_entry(ULONG thread_input);
 static void  print_array(CHAR* array_ptr, ULONG array_len);
+static ULONG get_memory_available(void);
 
 #if (1 == CHECK_SORT_ALGORITHMS)
 static void  check_sort_algorithm(void (*sort_algorithm)(
@@ -61,6 +62,7 @@ static queue_t my_queue = {NULL, NULL, NULL, 0};
 
 static void check_stack(void);
 static void check_queue(void);
+static void check_dbll_list(void);
 #endif
 
 int main(void)
@@ -118,6 +120,7 @@ static void  main_thread_entry(ULONG thread_input)
 #if (1 == CHECK_DATA_STRUCTURES)
     check_stack();
     check_queue();
+    check_dbll_list();
 #endif
 }
 
@@ -188,51 +191,7 @@ static void  check_sort_algorithm(void (*sort_algorithm)(
 }
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-void* my_malloc(size_t size){
-    void* result = NULL;
-    void* temp_pointer = NULL;
-    // allocate memory
-    UINT status = tx_byte_allocate(&main_pool, (VOID **) &temp_pointer,
-                                   size, TX_NO_WAIT);
-    if (TX_SUCCESS == status)
-    {
-        result = temp_pointer;
-        update_minimal_memory_available();
-    }else{
-        printf("Error: memory allocation\n");
-    }
-    return result;
-}
-void my_free(void* mem_ptr)
-{
-    if (NULL != mem_ptr)
-    {
-        UINT status = tx_byte_release((VOID *)mem_ptr);
-        if (TX_SUCCESS != status)
-        {
-            printf("Error: memory releasing\n");
-        }
-    }
-}
-void update_minimal_memory_available(void)
-{
-    ULONG available = 0;
-    
-    tx_byte_pool_info_get(&main_pool, NULL, &available, NULL, NULL, NULL, NULL);
-    if(minimal_memory_available > available)
-    {
-        minimal_memory_available = available;
-    }
-}
-
-#ifdef __cplusplus
-}
-#endif
-
+#if (1 == CHECK_DATA_STRUCTURES)
 static void check_stack(void)
 {
     char temp_arr[5] = {0x03, 0x04, 0x05, 0x06, 0x07};
@@ -332,3 +291,100 @@ static void check_queue(void)
     
     queue_deinit(&my_queue);
 }
+
+static void check_dbll_list(void)
+{
+    Dbll_list* dbll_list = new Dbll_list;
+    Dbll_list* dbll_list_1 = new Dbll_list;
+    
+    printf("Memory available: %lu\n", (unsigned long)get_memory_available());
+    
+    dbll_list->print();
+    dbll_list->insert(2, 0x01);
+    printf("dbll_list->insert(2, 0x01); Memory available: %lu\n", (unsigned long)get_memory_available());
+    dbll_list->add(0x02);
+    printf("dbll_list->add(0x02); Memory available: %lu\n", (unsigned long)get_memory_available());
+    dbll_list->add(0x03);
+    printf("dbll_list->add(0x03); Memory available: %lu\n", (unsigned long)get_memory_available());
+    dbll_list->add(0x04);
+    printf("dbll_list->add(0x04); Memory available: %lu\n", (unsigned long)get_memory_available());
+    dbll_list->add(0x05);
+    printf("dbll_list->add(0x05); Memory available: %lu\n", (unsigned long)get_memory_available());
+    dbll_list->split(3, dbll_list_1);
+    printf("dbll_list->split(3, dbll_list_1); Memory available: %lu\n", (unsigned long)get_memory_available());
+
+    dbll_list_1->merge(dbll_list);
+    printf("dbll_list_1->merge(dbll_list); Memory available: %lu\n", (unsigned long)get_memory_available());
+    
+    delete(dbll_list);
+    printf("delete(dbll_list); Memory available: %lu\n\n", (unsigned long)get_memory_available());
+    
+    dbll_list_1->insert(2,0x10);
+    printf("dbll_list_1->insert(2,0x10); Memory available: %lu\n", (unsigned long)get_memory_available());
+    dbll_list_1->del(4);
+    printf("dbll_list_1->del(4); Memory available: %lu\n\n", (unsigned long)get_memory_available());
+    dbll_list_1->print();
+    
+    printf("dbll_list_1->get(2): %lu\n", (unsigned long)dbll_list_1->get(2));
+    printf("dbll_list_1->get(5): %lu\n\n", (unsigned long)dbll_list_1->get(5));
+    
+    printf("dbll_list_1->search(16): %lu\n", (unsigned long)dbll_list_1->search(16));
+    printf("dbll_list_1->search(1): %lu\n\n", (unsigned long)dbll_list_1->search(1));
+    
+    delete(dbll_list_1);
+    printf("delete(dbll_list_1); Memory available: %lu\n\n", (unsigned long)get_memory_available());
+}
+#endif 
+
+static ULONG get_memory_available(void)
+{
+    ULONG available = 0;
+    tx_byte_pool_info_get(&main_pool, NULL, &available, NULL, NULL, NULL, NULL);
+    return available;
+}
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void* my_malloc(size_t size){
+    void* result = NULL;
+    void* temp_pointer = NULL;
+    // allocate memory
+    UINT status = tx_byte_allocate(&main_pool, (VOID **) &temp_pointer,
+                                   size, TX_NO_WAIT);
+    if (TX_SUCCESS == status)
+    {
+        result = temp_pointer;
+        update_minimal_memory_available();
+    }else{
+        printf("Error: memory allocation\n");
+    }
+    return result;
+}
+
+void my_free(void* mem_ptr)
+{
+    if (NULL != mem_ptr)
+    {
+        UINT status = tx_byte_release((VOID *)mem_ptr);
+        if (TX_SUCCESS != status)
+        {
+            printf("Error: memory releasing\n");
+        }
+    }
+}
+
+void update_minimal_memory_available(void)
+{
+    ULONG available = get_memory_available();
+
+    if(minimal_memory_available > available)
+    {
+        minimal_memory_available = available;
+    }
+}
+
+#ifdef __cplusplus
+}
+#endif

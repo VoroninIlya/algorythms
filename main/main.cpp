@@ -10,6 +10,7 @@
 #include "stack.h"
 #include "queue.h"
 #include "doubly_linked_list.hpp"
+#include "binary_tree.hpp"
 #endif
 
 #ifdef __cplusplus
@@ -31,6 +32,7 @@ extern "C" {
 #define     DATA_LENGTH        10
 #endif
 #if (1 == CHECK_DATA_STRUCTURES)
+#define     DATA_LENGTH        1024
 #define     MY_STACK_SIZE      7
 #define     MY_QUEUE_SIZE      7
 #endif
@@ -63,6 +65,7 @@ static queue_t my_queue = {NULL, NULL, NULL, 0};
 static void check_stack(void);
 static void check_queue(void);
 static void check_dbll_list(void);
+static void check_binary_tree(void);
 #endif
 
 int main(void)
@@ -121,6 +124,8 @@ static void  main_thread_entry(ULONG thread_input)
     check_stack();
     check_queue();
     check_dbll_list();
+    check_binary_tree();
+    printf("Memory available: %lu\n", (unsigned long)get_memory_available());
 #endif
 }
 
@@ -333,6 +338,52 @@ static void check_dbll_list(void)
     
     delete(dbll_list_1);
     printf("delete(dbll_list_1); Memory available: %lu\n\n", (unsigned long)get_memory_available());
+}
+
+static void check_binary_tree(void)
+{
+    Binary_tree tree_1;
+    
+    printf("Memory available: %lu\n", (unsigned long)get_memory_available());
+    
+    tree_1.insert(Binary_tree_node(uint32_t(3)));
+    printf("tree_1.insert(3); Memory available: %lu\n", (unsigned long)get_memory_available());
+    tree_1.insert(Binary_tree_node(uint32_t(1)));
+    printf("tree_1.insert(1); Memory available: %lu\n", (unsigned long)get_memory_available());
+    tree_1.insert(Binary_tree_node(uint32_t(2)));
+    printf("tree_1.insert(2); Memory available: %lu\n", (unsigned long)get_memory_available());
+    tree_1.insert(Binary_tree_node(uint32_t(10)));
+    printf("tree_1.insert(10); Memory available: %lu\n", (unsigned long)get_memory_available());
+    tree_1.insert(Binary_tree_node(uint32_t(4)));
+    printf("tree_1.insert(4); Memory available: %lu\n", (unsigned long)get_memory_available());
+    tree_1.insert(Binary_tree_node(uint32_t(0)));
+    printf("tree_1.insert(0); Memory available: %lu\n", (unsigned long)get_memory_available());
+    tree_1.insert(Binary_tree_node(uint32_t(5)));
+    printf("tree_1.insert(5); Memory available: %lu\n", (unsigned long)get_memory_available());
+    
+    tree_1.print();
+    
+    tree_1.del(tree_1.search(4));
+    printf("tree_1.del(4); Memory available: %lu\n", (unsigned long)get_memory_available());
+
+    tree_1.del(tree_1.search(1));
+    printf("tree_1.del(1); Memory available: %lu\n", (unsigned long)get_memory_available());
+    
+    tree_1.del(tree_1.search(3));
+    printf("tree_1.del(3); Memory available: %lu\n", (unsigned long)get_memory_available());
+    
+    tree_1.print();
+    
+    
+    printf("tree_1.search(2).print():\n");
+    tree_1.search(2).print();
+    printf("\n");
+    printf("tree_1.search(100).print():\n");
+    tree_1.search(100).print();
+    printf("\n");
+    printf("tree_1.maximum().print():\n");
+    tree_1.maximum(tree_1.get_root()).print();
+    printf("\n");
 }
 #endif 
 

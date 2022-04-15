@@ -1,5 +1,5 @@
-#ifndef INSERTION_SORT_H
-#define INSERTION_SORT_H
+#ifndef SELECTION_SORT_H
+#define SELECTION_SORT_H
 
 #include "common_func.h"
 
@@ -7,8 +7,8 @@
 extern "C" {
 #endif
 
-// insertion sort algorithm
-void insertion_sort(
+// selection sort algorithm
+void selection_sort(
     char* array_ptr,                 // pointer to data array
     unsigned long array_len,         // data array length
     char (*condition_fn)(char, char) // condition function
@@ -18,4 +18,4 @@ void insertion_sort(
 }
 #endif
 
-#endif // INSERTION_SORT_H
+#endif // SELECTION_SORT_H

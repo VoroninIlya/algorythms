@@ -1,13 +1,22 @@
 #include "queue.h"
-#include "main.h"
+
+void queue_set_alloc_cb(queue_t* const queue_ptr, queue_allocCb_t alcb) {
+    queue_ptr->allocCb = alcb;
+}
+
+void queue_set_free_cb(queue_t* const queue_ptr, queue_freeCb_t free) {
+    queue_ptr->freeCb = free;
+}
 
 void queue_init(queue_t* const queue_ptr, unsigned long int size)
 {
     if ((NULL == queue_ptr->main_ptr) &&
         (NULL == queue_ptr->head_ptr) &&
-        (NULL == queue_ptr->tail_ptr))
+        (NULL == queue_ptr->tail_ptr) && 
+        (NULL != queue_ptr->allocCb) && 
+        (NULL != queue_ptr->freeCb))
     {
-        queue_ptr->main_ptr = my_malloc(size);
+        queue_ptr->main_ptr = queue_ptr->allocCb(size);
         if (NULL != queue_ptr->main_ptr)
         {
             queue_ptr->tail_ptr = queue_ptr->head_ptr = queue_ptr->main_ptr;
@@ -20,7 +29,9 @@ void queue_deinit(queue_t* const queue_ptr)
 {
     if (NULL != queue_ptr->main_ptr)
     {
-        my_free(queue_ptr->main_ptr);
+        if(NULL != queue_ptr->freeCb) {
+            queue_ptr->freeCb(queue_ptr->main_ptr);
+        }
         queue_ptr->main_ptr = NULL;
         queue_ptr->head_ptr = NULL;
         queue_ptr->tail_ptr = NULL;

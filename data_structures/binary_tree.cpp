@@ -1,5 +1,5 @@
 #include "binary_tree.hpp"
-#include "main.h"
+#include <stdio.h>
 
 // =========================================================================
 // class Binary_tree_node
@@ -8,9 +8,9 @@
 Binary_tree_node::Binary_tree_node()
 {
     this->key = 0;
-    this->parent = NULL;
-    this->l_child = NULL;
-    this->r_child = NULL;
+    this->parent = nullptr;
+    this->l_child = nullptr;
+    this->r_child = nullptr;
     this->shadow_flag = false;
 }
 
@@ -29,9 +29,9 @@ Binary_tree_node::Binary_tree_node(const Binary_tree_node &n)
 Binary_tree_node::Binary_tree_node(uint32_t key)
 {
     this->key = key;
-    this->parent = NULL;
-    this->l_child = NULL;
-    this->r_child = NULL;
+    this->parent = nullptr;
+    this->l_child = nullptr;
+    this->r_child = nullptr;
     this->shadow_flag = false;
 }
 
@@ -149,37 +149,41 @@ bool Binary_tree_node::is_shadow(void) const
 // class Binary_tree
 // =========================================================================
 
-Binary_tree::Binary_tree()
+Binary_tree::Binary_tree(std::shared_ptr<IMyAllocator> alloc)
 {
+    this->allocator = std::move(alloc);
+
     this->root = NULL;
     
     Binary_tree_node tmp_shadow_node(true);
-    this->shadow_node = (Binary_tree_node*)my_malloc(sizeof(tmp_shadow_node));
+    this->shadow_node = (Binary_tree_node*)allocator->alloc(sizeof(tmp_shadow_node));
     *this->shadow_node = tmp_shadow_node;
 }
 
 Binary_tree::~Binary_tree()
 {
-    this->inorder_tree_walk(this->root, Binary_tree::delete_fn);
+    this->inorder_tree_walk(this->root, [this](Binary_tree_node* p){
+        this->allocator->free((void*)p);
+    });
     
-    my_free((void*)this->shadow_node);
+    allocator->free((void*)this->shadow_node);
     this->shadow_node = NULL;
 }
 
-void Binary_tree::print_fn(Binary_tree_node* n)
+void Binary_tree::print_fn(const Binary_tree_node* n)
 {
     n->print();
 }
 
-void Binary_tree::delete_fn(Binary_tree_node* n)
+void Binary_tree::delete_fn(const Binary_tree_node* n)
 {
-    my_free((void*)n);
+    allocator->free((void*)n);
     n = NULL;
 }
 
 void Binary_tree::inorder_tree_walk(
     Binary_tree_node* node, 
-    void (*fn_cb)(Binary_tree_node*))
+    std::function<void(Binary_tree_node*)> fn_cb)
 {
     if (NULL != node)
     {
@@ -332,7 +336,7 @@ void Binary_tree::insert(const Binary_tree_node &node)
     // Allocating memory through my_malloc function instead:
     // Binary_tree_node* new_node = new Binary_tree_node(node);
     // to be able to count it by using ThreadX
-    Binary_tree_node* new_node = (Binary_tree_node*)my_malloc(sizeof(node));
+    Binary_tree_node* new_node = (Binary_tree_node*)allocator->alloc(sizeof(node));
     *new_node = node;
     
     while(NULL != tmp_node_2)
@@ -446,6 +450,8 @@ Binary_tree_node* Binary_tree::get_node_ptr(const Binary_tree_node &node)
 
 void Binary_tree::print(void)
 {
-    this->inorder_tree_walk(this->root, Binary_tree::print_fn);
+    this->inorder_tree_walk(this->root, [this](Binary_tree_node* n){
+        this->print_fn(n);
+    });
     
 }

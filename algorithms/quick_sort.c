@@ -1,6 +1,4 @@
 #include "quick_sort.h"
-#include "main.h"
-
 
 static unsigned long partition(
     char* array_ptr,

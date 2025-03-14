@@ -1,4 +1,6 @@
 #include "main.h"
+#include <memory>
+
 #if (1 == CHECK_SORT_ALGORITHMS) 
 #include "insertion_sort.h"
 #include "selection_sort.h"
@@ -11,6 +13,7 @@
 #include "queue.h"
 #include "doubly_linked_list.hpp"
 #include "binary_tree.hpp"
+#include "allocator.hpp"
 #endif
 
 #ifdef __cplusplus
@@ -97,11 +100,15 @@ void    tx_application_define(void *first_unused_memory)
                      TX_NO_TIME_SLICE, TX_AUTO_START);
 
 #if (1 == CHECK_DATA_STRUCTURES)
+    stack_set_alloc_cb(&my_stack, my_malloc);
+    stack_set_free_cb(&my_stack, my_free);
     stack_init(&my_stack, MY_STACK_SIZE);
     unsigned long int stack_space = get_stack_free_space(&my_stack);
     printf("my_stack initialized\n");
     printf("my_stack free space: %lu\n", stack_space);
     
+    queue_set_alloc_cb(&my_queue, my_malloc);
+    queue_set_free_cb(&my_queue, my_free);
     queue_init(&my_queue, MY_QUEUE_SIZE);
     unsigned long int queue_space = get_queue_free_space(&my_queue);
     printf("my_queue initialized\n");
@@ -148,7 +155,7 @@ static void  check_sort_algorithm(void (*sort_algorithm)(
     
     assert(sort_algorithm, "Null-pointer in check_sort_algorithm");
     
-    char* input_data = my_malloc(DATA_LENGTH);
+    char* input_data = (char*)my_malloc(DATA_LENGTH);
     
     // Initialize input_data
     for(ULONG index = 0; index < DATA_LENGTH; index++)
@@ -201,7 +208,7 @@ static void check_stack(void)
 {
     char temp_arr[5] = {0x03, 0x04, 0x05, 0x06, 0x07};
     char temp_byte = 0;
-    
+
     printf("1. Add byte to the stack:\n");
     push_byte(&my_stack, 0x01);
     print_stack_content(&my_stack);
@@ -241,7 +248,7 @@ static void check_queue(void)
 {
     char temp_arr[5] = {0x03, 0x04, 0x05, 0x06, 0x07};
     char temp_byte = 0;
-    
+
     printf("1. Add byte to the queue:\n");
     enqueue_byte(&my_queue, 0x01);
     print_queue_content(&my_queue);
@@ -299,8 +306,10 @@ static void check_queue(void)
 
 static void check_dbll_list(void)
 {
-    Dbll_list* dbll_list = new Dbll_list;
-    Dbll_list* dbll_list_1 = new Dbll_list;
+    
+    auto allocator = std::make_shared<MyAllocator>(MyAllocator(my_malloc, my_free));
+    Dbll_list* dbll_list = new Dbll_list(allocator);
+    Dbll_list* dbll_list_1 = new Dbll_list(allocator);
     
     printf("Memory available: %lu\n", (unsigned long)get_memory_available());
     
@@ -342,7 +351,8 @@ static void check_dbll_list(void)
 
 static void check_binary_tree(void)
 {
-    Binary_tree tree_1;
+    auto allocator = std::make_shared<MyAllocator>(MyAllocator(my_malloc, my_free));
+    Binary_tree tree_1{allocator};
     
     printf("Memory available: %lu\n", (unsigned long)get_memory_available());
     
@@ -398,7 +408,7 @@ static ULONG get_memory_available(void)
 extern "C" {
 #endif
 
-void* my_malloc(size_t size){
+void* my_malloc(size_t size) {
     void* result = NULL;
     void* temp_pointer = NULL;
     // allocate memory

@@ -5,6 +5,19 @@
 extern "C" {
 #endif
 
+#include <stdio.h>
+#include <stdlib.h>
+
+#define assert(cond, message) \
+do \
+{ \
+    if (0 == cond) \
+    { \
+        printf("Assert: %s\n", message); \
+        while(1){;} \
+    }\
+} while(0)
+
 // function to compare two values, 
 // return true if val_1 > val_2
 char greater_then(char val_1, char val_2);

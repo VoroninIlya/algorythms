@@ -5,12 +5,22 @@
 extern "C" {
 #endif
 
+#include <stdio.h>
+
+typedef void* (*queue_allocCb_t)(size_t size);
+typedef void (*queue_freeCb_t)(void* mem_ptr);
+
 typedef struct {
     char* main_ptr;
     char* head_ptr;
     char* tail_ptr;
     unsigned long int size;
+    queue_allocCb_t allocCb;
+    queue_freeCb_t freeCb;
 }queue_t;
+
+void queue_set_alloc_cb(queue_t* const queue_ptr, queue_allocCb_t alcb);
+void queue_set_free_cb(queue_t* const queue_ptr, queue_freeCb_t alcb);
 
 void queue_init(queue_t* const queue_ptr, unsigned long int size);
 void queue_deinit(queue_t* const queue_ptr);

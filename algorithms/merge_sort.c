@@ -1,5 +1,4 @@
 #include "merge_sort.h"
-#include "main.h"
 
 static void merge(
     char* array_ptr,

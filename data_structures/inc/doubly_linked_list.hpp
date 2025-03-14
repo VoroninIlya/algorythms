@@ -1,7 +1,9 @@
-#ifndef DOUBLY_LINKED_LIST_H
-#define DOUBLY_LINKED_LIST_H
+#pragma once
 
 #include <stdint.h>
+#include <stdio.h>
+#include <memory>
+#include "allocator.hpp"
 
 #ifdef __cplusplus
 extern "C" {
@@ -12,7 +14,7 @@ typedef struct node
     uint8_t key;
     struct node* next;
     struct node* prev;
-}node_t;
+} node_t;
 
 #ifdef __cplusplus
 }
@@ -25,10 +27,13 @@ private:
     node_t *head;
     node_t *tail;
     uint32_t length;
-    
+    std::shared_ptr<IMyAllocator> allocator;
+
 public:
     // default constructor
-    Dbll_list();
+    Dbll_list() = delete;
+    
+    Dbll_list(std::shared_ptr<IMyAllocator>);
     // copy constructor
     Dbll_list(const Dbll_list &dbll_list);
     // override the assignment operator
@@ -50,5 +55,3 @@ public:
     
     void print(void);
 };
-
-#endif // DOUBLY_LINKED_LIST_H

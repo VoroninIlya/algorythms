@@ -2,6 +2,10 @@
 #define BINARY_TREE_H
 
 #include <stdint.h>
+#include <stdio.h>
+#include <memory>
+#include <functional>
+#include "allocator.hpp"
 
 // =========================================================================
 // class Binary_tree_node
@@ -61,15 +65,17 @@ class Binary_tree
 private:
     Binary_tree_node* root;
     Binary_tree_node* shadow_node;
-    
+
+    std::shared_ptr<IMyAllocator> allocator;
+
     // Block copy constructor
     Binary_tree(const Binary_tree &tree){}
     // Block operator=
     Binary_tree& operator= (const Binary_tree &tree){return *this;}
     
     void inorder_tree_walk(
-        Binary_tree_node* node,            // start node
-        void (*fn_cb)(Binary_tree_node*)); // action function callback
+        Binary_tree_node*,                        // start node
+        std::function<void(Binary_tree_node*)>); // action function callback
     
     Binary_tree_node* search_recursive(
         const Binary_tree_node*, 
@@ -86,13 +92,14 @@ private:
         Binary_tree_node*, 
         Binary_tree_node*);
         
-    Binary_tree_node* get_node_ptr(const Binary_tree_node &node);
+    Binary_tree_node* get_node_ptr(const Binary_tree_node&);
     
-    static void print_fn(Binary_tree_node* n);
-    static void delete_fn(Binary_tree_node* n);
+    void print_fn(const Binary_tree_node* n);
+    void delete_fn(const Binary_tree_node* n);
     
 public:
-    Binary_tree();
+    Binary_tree() = delete;
+    Binary_tree(std::shared_ptr<IMyAllocator>);
     
     ~Binary_tree();
     
@@ -106,8 +113,8 @@ public:
     const Binary_tree_node& minimum(const Binary_tree_node&);
     const Binary_tree_node& maximum(const Binary_tree_node&);
     
-    void insert(const Binary_tree_node &node);
-    void del(const Binary_tree_node &node);
+    void insert(const Binary_tree_node&);
+    void del(const Binary_tree_node&);
     
     void print(void);
 };

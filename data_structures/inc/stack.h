@@ -5,11 +5,21 @@
 extern "C" {
 #endif
 
+#include <stdio.h>
+
+typedef void* (*stack_allocCb_t)(size_t size);
+typedef void (*stack_freeCb_t)(void* mem_ptr);
+
 typedef struct {
     char* main_ptr;
     char* top_ptr;
     unsigned long int size;
+    stack_allocCb_t allocCb;
+    stack_freeCb_t freeCb;
 }stack_t;
+
+void stack_set_alloc_cb(stack_t* const stack_ptr, stack_allocCb_t alcb);
+void stack_set_free_cb(stack_t* const stack_ptr, stack_freeCb_t alcb);
 
 void stack_init(stack_t* const stack_ptr, unsigned long int size);
 void stack_deinit(stack_t* const stack_ptr);

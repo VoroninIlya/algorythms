@@ -1,5 +1,4 @@
 #include "insertion_sort.h"
-#include "main.h"
 
 void insertion_sort(
     char* array_ptr, 

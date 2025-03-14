@@ -1,0 +1,119 @@
+{
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "default-aarch64",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "toolchainFile": "${sourceDir}/cmake/gcc-aarch64-linux.cmake",
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "THREADX_ARCH": "cortex_m7",
+        "THREADX_TOOLCHAIN": "gnu"
+      }
+    },
+    {
+      "name": "Debug-aarch64",
+      "inherits": "default-aarch64",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "RelWithDebInfo-aarch64",
+      "inherits": "default-aarch64",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+      }
+    },
+    {
+      "name": "Release-aarch64",
+      "inherits": "default-aarch64",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "default-arm",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "toolchainFile": "${sourceDir}/cmake/gcc-arm-none-eabi.cmake",
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "THREADX_ARCH": "cortex_m4",
+        "THREADX_TOOLCHAIN": "gnu"
+      }
+    },
+    {
+      "name": "Debug-arm",
+      "inherits": "default-arm",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "RelWithDebInfo-arm",
+      "inherits": "default-arm",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+      }
+    },
+    {
+      "name": "Release-arm",
+      "inherits": "default-arm",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "default-linux",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "toolchainFile": "${sourceDir}/cmake/gcc.cmake",
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "THREADX_ARCH": "linux",
+        "THREADX_TOOLCHAIN": "gnu",
+        "CHECK_SORT_ALGORITHMS": "ON",
+        "CHECK_DATA_STRUCTURES": "OFF"
+      }
+    },
+    {
+      "name": "Lin64-Debug",
+      "inherits": "default-linux",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "default-win",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "THREADX_ARCH": "win32",
+        "THREADX_TOOLCHAIN": "gnu"
+      }
+    },
+    {
+      "name": "Win32-Debug",
+      "inherits": "default-win",
+      "toolchainFile": "${sourceDir}/cmake/i686-w64-mingw32-gcc.cmake",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "Win64-Debug",
+      "inherits": "default-win",
+      "toolchainFile": "${sourceDir}/cmake/x86_64-w64-mingw32-gcc.cmake",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    }
+  ]
+}

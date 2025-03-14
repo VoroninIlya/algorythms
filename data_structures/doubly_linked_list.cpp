@@ -1,8 +1,9 @@
 #include "doubly_linked_list.hpp"
-#include "main.h"
+#include <stdio.h>
 
-Dbll_list::Dbll_list()
+Dbll_list::Dbll_list(std::shared_ptr<IMyAllocator> alloc)
 {
+    this->allocator = std::move(alloc);
     this->head = NULL;
     this->tail = NULL;
     this->length = 0;
@@ -10,10 +11,12 @@ Dbll_list::Dbll_list()
 
 Dbll_list::Dbll_list(const Dbll_list &dbll_list)
 {
+    //TODO clear this list
+
     this->head = NULL;
     this->tail = NULL;
     this->length = 0;
-    
+
     *this = dbll_list;
 }
 
@@ -61,7 +64,10 @@ bool Dbll_list::add(uint8_t key)
 {
     bool result = false;
     // reserve memory for new node
-    node_t* new_node = (node_t*)my_malloc(sizeof(node_t));
+    if(!allocator)
+        return result;
+
+    node_t* new_node = (node_t*)allocator->alloc(sizeof(node_t));
     if (NULL != new_node)
     {
         new_node->key = key;
@@ -169,7 +175,7 @@ bool Dbll_list::insert(uint32_t index, uint8_t key)
         }
     }else
     {
-        Dbll_list tmp_dbll_list;
+        Dbll_list tmp_dbll_list{this->allocator};
         this->split(index-1, &tmp_dbll_list);
         this->add(key);
         this->merge(&tmp_dbll_list);
@@ -180,7 +186,7 @@ bool Dbll_list::insert(uint32_t index, uint8_t key)
 
 bool Dbll_list::del(uint32_t index)
 {
-    Dbll_list tmp_dbll_list_1, tmp_dbll_list_2;
+    Dbll_list tmp_dbll_list_1{this->allocator}, tmp_dbll_list_2{this->allocator};
     
     this->split(index+1, &tmp_dbll_list_2);
     this->split(index, &tmp_dbll_list_1);
@@ -201,7 +207,7 @@ bool Dbll_list::clear(void)
             {
                 this->tail->next = NULL;
             }
-            my_free((void*)curr_node);
+            allocator->free((void*)curr_node);
             curr_node = this->tail;
         }
         this->head = this->tail = NULL;

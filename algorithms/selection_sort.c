@@ -1,5 +1,4 @@
 #include "selection_sort.h"
-#include "main.h"
 
 void selection_sort(
     char* array_ptr, 

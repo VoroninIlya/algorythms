@@ -1,12 +1,21 @@
 #include "stack.h"
-#include "main.h"
+
+void stack_set_alloc_cb(stack_t* const stack_ptr, stack_allocCb_t alcb) {
+    stack_ptr->allocCb = alcb;
+}
+
+void stack_set_free_cb(stack_t* const stack_ptr, stack_freeCb_t free) {
+    stack_ptr->freeCb = free;
+}
 
 void stack_init(stack_t* const stack_ptr, unsigned long int size)
 {
     if ((NULL == stack_ptr->main_ptr) &&
-        (NULL == stack_ptr->top_ptr))
+        (NULL == stack_ptr->top_ptr) && 
+        (NULL != stack_ptr->allocCb) && 
+        (NULL != stack_ptr->freeCb))
     {
-        stack_ptr->main_ptr = my_malloc(size);
+        stack_ptr->main_ptr = (char*)stack_ptr->allocCb(size);
         if (NULL != stack_ptr->main_ptr)
         {
             stack_ptr->top_ptr = stack_ptr->main_ptr;
@@ -19,7 +28,9 @@ void stack_deinit(stack_t* const stack_ptr)
 {
     if (NULL != stack_ptr->main_ptr)
     {
-        my_free(stack_ptr->main_ptr);
+        if(NULL != stack_ptr->freeCb) {
+            stack_ptr->freeCb(stack_ptr->main_ptr);
+        }
         stack_ptr->main_ptr = NULL;
         stack_ptr->top_ptr = NULL;
         stack_ptr->size = 0;
